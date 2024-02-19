@@ -1,53 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Image, Button } from 'react-native';
 
-let runWatch = false;
-let startingTime;
-let passedTime = 0;
-
-
-function startWatch() {
-    if (!runWatch) {
-        startingTime = Date.now() - passedTime;
-        running = true;
-        displayWatch();
-    }
-}
-
-function stopWatch() {
-    if (running) {
-        runWatch = false;
-        clearInterval(interval);
-    }
-}
-
-function resetWatch() {
-    stopWatch();
-    passedTime = 0;
-    displayWatch();
-}
-
-function displayWatch() {
-    interval = setInterval(function () {
-        timeChange = Date.now() - startingTime;
-        showTime(timeChange);
-    });
-}
-
-function showTime(time) {
-  let millisecond = Math.floor((time%1000)/10);
-  let minute = Math.floor(time/6000);
-  let second = Math.floor((time%6000)/1000);
-    return `${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}:${String(millisecond).padStart(2, '0')}`;
-}
 
 export default function AssetExample() {
-    const [time, setTime] = useState('00:00:00');
+    const [start, setStart] = useState(null);
+    const [run, setRun] = useState(false);
+    const [passTime, setPassTime] = useState(0);
+    const [laps, setLaps] = useState([]);
+
+    useEffect(() => {
+        let interval;
+
+        if (run) {
+            const showUpdate = () => {
+                const timeNow = Date.now();
+                const passedTime = timeNow - start;
+                setPassTime(passedTime);
+            };
+
+            interval = setInterval(showUpdate, 10);
+        } else {
+            clearInterval(interval);
+        }
+
+        return () => clearInterval(interval);
+    }, [run, start]);
+
+    const startWatch = () => {
+        if (!run) {
+            setStart(Date.now() - passTime);
+            setRun(true);
+        }
+    };
+
+    const stopWatch = () => {
+        if (run) {
+            setRun(false);
+        }
+    };
+
+    const resetWatch = () => {
+        setStart(null);
+        setRun(false);
+        setPassTime(0);
+        setLaps([])
+    };
+
+    const addLap = () => {
+        const newLaps = [...laps, passTime];
+        setLaps(newLaps)
+    }
+
+    const showTime = (time) => {
+        let millisecond = Math.floor((time % 1000)/10);
+        let second = Math.floor((time % 60000) / 1000);
+        let minute = Math.floor((time / 60000));
+
+        millisecond = String(millisecond).padStart(2, '0');
+        second = String(second).padStart(2, '0');
+        minute = String(minute).padStart(2, '0');
+
+        return `${minute}:${second}:${millisecond}`
+    }
 
     return (
         <View style={styles.container}>
             <Text style={styles.paragraph}>Stopwatch</Text>
-            <Text style={styles.timerText}>{time}</Text>
+            <div>{showTime(passTime)}</div>
             <View style={styles.buttonContainer}>
                 <Button title="Start" onPress={startWatch} style={styles.button} color="#00ff00"/>
                 <Button title="Lap" style={styles.button}/>

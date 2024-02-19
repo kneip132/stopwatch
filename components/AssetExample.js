@@ -66,15 +66,22 @@ export default function AssetExample() {
     return (
         <View style={styles.container}>
             <Text style={styles.paragraph}>Stopwatch</Text>
-            <div>{showTime(passTime)}</div>
+            <Text style={styles.timerText}>{showTime(passTime)}</Text>
             <View style={styles.buttonContainer}>
                 <Button title="Start" onPress={startWatch} style={styles.button} color="#00ff00"/>
-                <Button title="Lap" style={styles.button}/>
+                <Button title="Lap" onPress={addLap} style={styles.button}/>
                 <Button title="Stop" onPress={stopWatch} style={styles.button} color="#ff0000"/>
 
             </View>
             <View style={styles.buttonContainerReset}>
                 <Button title="Reset" onPress={resetWatch} color="#696969"/>
+            </View>
+            <Text>_____________________________________</Text>
+            <Text style={styles.lapTitle}>Laps</Text>
+            <View style={styles.lapContainer}>
+                {laps.map((lap, index) => (
+                    <Text key={index} style={styles.lap}>{`Lap ${index + 1} - ${showTime(lap)}`}</Text>
+                ))}
             </View>
         </View>
     );
@@ -87,7 +94,7 @@ const styles = StyleSheet.create({
         padding: 24,
     },
     paragraph: {
-      margin: 24,
+      margin: 15,
       marginTop: 0,
       fontSize: 30,
       fontWeight: 'bold',
@@ -110,8 +117,24 @@ const styles = StyleSheet.create({
       width: '100%',
   },
     timerText: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
+        fontSize: 20,
+        marginBottom: 10,
+    },
+    lapContainer: {
+      overflowY: 'scroll',
+      margin: 10,
+      width: '90%',
+      height:'150px',
+  },
+    lap: {
+      fontSize: 17,
+  },
+
+  lapTitle: {
+    marginTop: 5,
+    marginBottom: 5,
+    fontSize: 25,
+    fontWeight: 'bold',
+    textAlign: 'center',
     },
 });
